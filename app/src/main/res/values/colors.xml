@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="primary_dark" type="color">#1B5E20</item>
+
+    <item name="tool_bar" type="color">#4CAF50</item>
+
+</resources>
