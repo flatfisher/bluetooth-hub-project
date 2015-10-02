@@ -1,45 +1,38 @@
 package com.liferay.healthcareproject;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.view.KeyEvent;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 /**
  * Created by flatfisher on 9/25/15.
  */
-public class CharacteristicFragment extends Fragment {
 
-    @Nullable
+public class CharacteristicFragment extends DialogFragment {
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_characteristic, container, false);
-        setOnKeyListener(view);
-        return view;
-    }
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-    private void setOnKeyListener(View view) {
-        view.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() != KeyEvent.ACTION_DOWN) {
-                    return false;
-                }
-                switch (keyCode) {
-                    case KeyEvent.KEYCODE_BACK:
-                        finish();
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-        });
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        LayoutInflater inflater = (LayoutInflater)getActivity()
+                                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        View view = inflater.inflate(R.layout.fragment_characteristic, null);
+
+        builder.setView(view);
+
+        return builder.create();
+
     }
 
     private void finish(){
+
         getFragmentManager().beginTransaction().remove(this).commit();
+
     }
 }
