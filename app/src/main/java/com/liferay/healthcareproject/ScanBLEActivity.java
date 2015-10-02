@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.liferay.healthcareproject.bluetooth.BlueToothDeviceManager;
 import com.liferay.healthcareproject.bluetooth.OnBlueToothDeviceListener;
@@ -19,7 +20,13 @@ import java.util.List;
 public class ScanBLEActivity extends BaseActivity implements OnBlueToothDeviceListener {
 
     private RecyclerView deviceRecyclerView;
+
+    private Toolbar toolbar;
+
+    private ProgressBar progressBar;
+
     private BlueToothDeviceManager blueToothDeviceManager;
+
     private List<ScanResult> scanResultList;
 
     @Override
@@ -59,7 +66,7 @@ public class ScanBLEActivity extends BaseActivity implements OnBlueToothDeviceLi
                                 Intent intent = new Intent(ScanBLEActivity.this,
                                         BLEDeviceActivity.class);
 
-                                intent.putExtra(ADDRESS_INTENT,name);
+                                intent.putExtra(ADDRESS_INTENT, name);
 
                                 startActivity(intent);
 
@@ -76,15 +83,25 @@ public class ScanBLEActivity extends BaseActivity implements OnBlueToothDeviceLi
 
     private void setToolbar() {
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        progressBar = new ProgressBar(this);
+
+        toolbar = (Toolbar) findViewById(R.id.tool_bar);
+
+        toolbar.addView(progressBar);
+
+        progressBar.setVisibility(View.GONE);
 
         toolbar.setNavigationIcon(android.R.drawable.ic_popup_sync);
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
+
                 scanBLEDevice();
+
             }
+
         });
 
     }
@@ -97,14 +114,23 @@ public class ScanBLEActivity extends BaseActivity implements OnBlueToothDeviceLi
 
         blueToothDeviceManager.startScan();
 
+        showProgressBar();
+
+    }
+
+    private void showProgressBar(){
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onResult(int callbackType, ScanResult result) {
 
         if (!isOverLap(result)){
+
             scanResultList.add(result);
+
             setValueToDeviceRecyclerView();
+
         }
 
     }
@@ -116,7 +142,9 @@ public class ScanBLEActivity extends BaseActivity implements OnBlueToothDeviceLi
 
             if (scanResult.getDevice().
                     getAddress().equals(result.getDevice().getAddress())){
+
                 return true;
+
             }
 
         }
@@ -127,6 +155,11 @@ public class ScanBLEActivity extends BaseActivity implements OnBlueToothDeviceLi
 
     @Override
     public void onFinish() {
-
+        stopProgressBar();
     }
+
+    private void stopProgressBar(){
+        progressBar.setVisibility(View.GONE);
+    }
+
 }

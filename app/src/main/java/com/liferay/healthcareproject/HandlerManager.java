@@ -29,4 +29,23 @@ public class HandlerManager {
 
         }).start();
     }
+
+    public static void setVisibility(final View view,final int status){
+
+        new Thread(new Runnable() {
+
+            public void run() {
+
+                view.post(new Runnable() {
+
+                    public void run() {
+
+                        view.setVisibility(status);
+
+                    }
+                });
+            }
+
+        }).start();
+    }
 }

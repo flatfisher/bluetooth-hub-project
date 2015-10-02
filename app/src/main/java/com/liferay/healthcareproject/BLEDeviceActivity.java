@@ -8,10 +8,12 @@ import android.bluetooth.BluetoothGattService;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.liferay.healthcareproject.bluetooth.BluetoothGattManager;
@@ -23,6 +25,11 @@ public class BLEDeviceActivity extends BaseActivity implements
         OnBlueToothGattListener, View.OnClickListener {
 
     private LinearLayout containerLayout;
+
+    private Toolbar toolbar;
+
+    private ProgressBar progressBar;
+
     private BluetoothGattManager bluetoothGattManager;
 
     @Override
@@ -33,12 +40,27 @@ public class BLEDeviceActivity extends BaseActivity implements
 
         containerLayout = (LinearLayout) findViewById(R.id.container_linearLayout);
 
+        setToolbar();
+
         String address = getIntent().getStringExtra(ADDRESS_INTENT);
 
         connect(address);
     }
 
+    private void setToolbar() {
+
+        progressBar = new ProgressBar(this);
+
+        toolbar = (Toolbar) findViewById(R.id.tool_bar);
+
+        toolbar.addView(progressBar);
+
+        progressBar.setVisibility(View.GONE);
+
+    }
+
     private void connect(String address) {
+
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
@@ -47,6 +69,12 @@ public class BLEDeviceActivity extends BaseActivity implements
 
         bluetoothGattManager.connectGatt(this, false);
 
+        showProgressBar();
+
+    }
+
+    private void showProgressBar(){
+        HandlerManager.setVisibility(progressBar,View.VISIBLE);
     }
 
     @Override
@@ -57,7 +85,9 @@ public class BLEDeviceActivity extends BaseActivity implements
         List<BluetoothGattService> services = gatt.getServices();
 
         for (BluetoothGattService bgs : services) {
+
             addUuid(bgs.getUuid().toString(), bgs.getCharacteristics());
+
         }
 
     }
@@ -115,7 +145,15 @@ public class BLEDeviceActivity extends BaseActivity implements
             button.setOnClickListener(this);
 
             HandlerManager.addView(containerLayout, button);
+
         }
+
+        stopProgressBar();
+
+    }
+
+    private void stopProgressBar(){
+        HandlerManager.setVisibility(progressBar,View.GONE);
     }
 
     @Override
