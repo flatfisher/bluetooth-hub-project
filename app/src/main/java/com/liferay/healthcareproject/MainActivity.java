@@ -18,8 +18,11 @@ public class MainActivity extends BaseActivity {
     }
 
     private void setToolbar() {
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+
         toolbar.setNavigationIcon(android.R.drawable.ic_popup_sync);
+
     }
 
 }

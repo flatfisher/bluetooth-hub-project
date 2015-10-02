@@ -31,8 +31,6 @@ public class CharacteristicFragment extends DialogFragment {
     }
 
     private void finish(){
-
         getFragmentManager().beginTransaction().remove(this).commit();
-
     }
 }

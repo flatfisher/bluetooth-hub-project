@@ -16,6 +16,7 @@ import java.util.List;
 
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+
 public class BlueToothDeviceManager implements BluetoothAdapter.LeScanCallback {
 
     private static final int SCAN_PERIOD = 10000;
@@ -33,17 +34,25 @@ public class BlueToothDeviceManager implements BluetoothAdapter.LeScanCallback {
     private List<BluetoothDevice> deviceList;
 
     public BlueToothDeviceManager(Context context,OnBlueToothDeviceListener listener) {
+
         this.context = context;
+
         onDeviceListener = listener;
+
         handler = new Handler();
+
         deviceList = new ArrayList<BluetoothDevice>();
+
         setUpBlueTooth();
+
     }
 
     public void startScan() {
+
         if (isBlueToothEnable()) {
             scanBlueToothDevices(true);
         }
+
     }
 
     public void stopScan() {
@@ -51,20 +60,25 @@ public class BlueToothDeviceManager implements BluetoothAdapter.LeScanCallback {
     }
 
     private void setUpBlueTooth() {
+
         bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+
         bluetoothAdapter = bluetoothManager.getAdapter();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         }
+
     }
 
     public boolean isBlueToothEnable() {
+
         if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
             return false;
         } else {
             return true;
         }
+
     }
 
     @Override
@@ -73,15 +87,19 @@ public class BlueToothDeviceManager implements BluetoothAdapter.LeScanCallback {
     }
 
     private ScanCallback scanCallback = new ScanCallback() {
+
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
+
             onDeviceListener.onResult(callbackType, result);
+
         }
 
         @Override
         public void onBatchScanResults(List<ScanResult> results) {
             super.onBatchScanResults(results);
+
         }
 
         @Override
@@ -91,6 +109,7 @@ public class BlueToothDeviceManager implements BluetoothAdapter.LeScanCallback {
     };
 
     private void scanBlueToothDevices(final boolean enable) {
+
         if (enable) {
             handler.postDelayed(new Runnable() {
                 @Override
@@ -104,12 +123,15 @@ public class BlueToothDeviceManager implements BluetoothAdapter.LeScanCallback {
             } else {
                 bluetoothAdapter.startLeScan(BlueToothDeviceManager.this);
             }
+
         } else {
             stopBlueToothDevices();
         }
+
     }
 
     private void stopBlueToothDevices(){
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             bluetoothLeScanner.stopScan(scanCallback);
         } else {
@@ -119,5 +141,6 @@ public class BlueToothDeviceManager implements BluetoothAdapter.LeScanCallback {
         if (onDeviceListener !=null){
             onDeviceListener.onFinish();
         }
+
     }
 }

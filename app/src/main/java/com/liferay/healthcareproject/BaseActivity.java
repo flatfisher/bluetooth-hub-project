@@ -7,5 +7,7 @@ import android.support.v7.app.AppCompatActivity;
  */
 
 public abstract class BaseActivity extends AppCompatActivity {
+
     protected final static String ADDRESS_INTENT = "address_intent";
+
 }

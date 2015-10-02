@@ -23,33 +23,45 @@ public class DeviceRecyclerViewAdapter extends RecyclerView.Adapter<DeviceRecycl
 
     public DeviceRecyclerViewAdapter(Context context,List<ScanResult> scanResultList) {
         super();
+
         layoutInflater = LayoutInflater.from(context);
+
         this.scanResultList = scanResultList;
+
     }
 
     @Override
     public DeviceRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
         View v = layoutInflater.inflate(R.layout.device_item, parent, false);
+
         return new ViewHolder(v);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onBindViewHolder(final DeviceRecyclerViewAdapter.ViewHolder holder, int position) {
+
         String name = scanResultList.get(position).getDevice().getName();
+
         if (name==null){
             name = "Unknown";
         }
+
         final String address = scanResultList.get(position).getDevice().getAddress();
 
         holder.name.setText(name);
+
         holder.address.setText(address);
+
         holder.cardView.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
 
             }
         });
+
     }
 
     @Override
@@ -58,15 +70,20 @@ public class DeviceRecyclerViewAdapter extends RecyclerView.Adapter<DeviceRecycl
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
+
         TextView name;
         TextView address;
         CardView cardView;
 
-        public ViewHolder(View v) {
-            super(v);
-            name = (TextView) v.findViewById(R.id.device_name);
-            address = (TextView) v.findViewById(R.id.device_address);
-            cardView = (CardView) v.findViewById(R.id.cardView);
+        public ViewHolder(View view) {
+            super(view);
+
+            name = (TextView) view.findViewById(R.id.device_name);
+
+            address = (TextView) view.findViewById(R.id.device_address);
+
+            cardView = (CardView) view.findViewById(R.id.cardView);
+
         }
     }
 }

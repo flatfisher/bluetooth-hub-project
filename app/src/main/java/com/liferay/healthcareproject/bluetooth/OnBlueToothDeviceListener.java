@@ -8,6 +8,9 @@ import android.bluetooth.le.ScanResult;
  */
 
 public interface OnBlueToothDeviceListener {
+
     public void onResult(int callbackType, ScanResult result);
+
     public void onFinish();
+
 }

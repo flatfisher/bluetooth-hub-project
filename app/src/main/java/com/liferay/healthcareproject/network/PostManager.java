@@ -33,67 +33,91 @@ public class PostManager implements Response.Listener<String>, Response.ErrorLis
     private ProgressBar materialProgressBar;
 
     public interface ResponseListener {
+
         public Response.Listener<String> onResponse(String response);
 
         public Response.ErrorListener onErrorResponse();
+
     }
 
     public PostManager(Context context, String posturl, ResponseListener responseListener) {
+
         this.context = context;
+
         POST_URL = posturl;
+
         POST_TAG = posturl;
+
         this.responseListener = responseListener;
     }
 
     public void setMaterialProgressBar(Toolbar toolbar) {
+
         this.toolbar = toolbar;
+
         materialProgressBar = new ProgressBar(context);
+
         toolbar.addView(materialProgressBar);
+
         materialProgressBar.setVisibility(View.GONE);
+
         stopProgressBar();
+
     }
 
     public void setTAG(String tag) {
+
         POST_TAG = tag;
+
     }
 
     public void connect(final Map<String, String> params) {
+
         requestQueue = Volley.newRequestQueue(context);
+
         StringRequest stringRequest = new StringRequest(Request.Method.POST, POST_URL, this, this) {
+
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 return params;
             }
         };
 
-
         requestQueue.add(stringRequest);
 
         if (toolbar != null) {
             showProgressBar();
         }
+
     }
 
     private void stop() {
+
         if (requestQueue != null) {
             requestQueue.cancelAll(POST_TAG);
         }
+
     }
 
     @Override
     public void onResponse(String response) {
+
         responseListener.onResponse(response);
         if (toolbar != null) {
             stopProgressBar();
         }
+
     }
 
     @Override
     public void onErrorResponse(VolleyError error) {
+
         responseListener.onErrorResponse();
+
         if (toolbar != null) {
             stopProgressBar();
         }
+
     }
 
     private void showProgressBar() {

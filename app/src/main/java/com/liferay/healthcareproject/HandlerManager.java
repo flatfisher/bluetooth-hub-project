@@ -12,14 +12,21 @@ public class HandlerManager {
     private HandlerManager(){}
 
     public static void addView(final ViewGroup viewGroup,final View view){
+
         new Thread(new Runnable() {
+
             public void run() {
+
                 viewGroup.post(new Runnable() {
+
                     public void run() {
+
                         viewGroup.addView(view);
+
                     }
                 });
             }
+
         }).start();
     }
 }
