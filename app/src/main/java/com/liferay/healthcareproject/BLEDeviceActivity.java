@@ -94,7 +94,6 @@ public class BLEDeviceActivity extends BaseActivity implements
     @Override
     public void onClick(View v) {
         moveToCharacteristic();
-        moveToCharacteristic();
     }
 
     @Override
