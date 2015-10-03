@@ -4,4 +4,6 @@
 
     <item name="tool_bar" type="color">#4CAF50</item>
 
+    <item name="dialog_back" type="color">#FFFFFF</item>
+
 </resources>
