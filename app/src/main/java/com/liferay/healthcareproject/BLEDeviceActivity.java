@@ -5,7 +5,9 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
@@ -158,22 +160,17 @@ public class BLEDeviceActivity extends BaseActivity implements
 
     @Override
     public void onClick(View v) {
-        moveToCharacteristic();
+        showCharacteristicDialog();
     }
 
-    private void moveToCharacteristic() {
+    private void showCharacteristicDialog() {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        DialogFragment characteristicFragment = new CharacteristicFragment();
 
-        CharacteristicFragment characteristicFragment = new CharacteristicFragment();
+        characteristicFragment.show(fragmentManager, Constants.CHARACTERISTIC_DIALOG);
 
-        fragmentTransaction.replace(R.id.fragment_container, characteristicFragment);
-
-        fragmentTransaction.addToBackStack(null);
-
-        fragmentTransaction.commit();
     }
 
 }

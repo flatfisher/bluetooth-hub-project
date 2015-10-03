@@ -7,5 +7,4 @@ public class Constants {
 
     public final static String CHARACTERISTIC_DIALOG = "characteristic_dialog";
 
-
 }
