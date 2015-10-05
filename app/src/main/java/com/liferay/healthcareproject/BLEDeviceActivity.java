@@ -8,7 +8,6 @@ import android.bluetooth.BluetoothGattService;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -16,19 +15,22 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.liferay.healthcareproject.bluetooth.BluetoothGattManager;
-import com.liferay.healthcareproject.bluetooth.OnBlueToothGattListener;
+import com.liferay.healthcareproject.bluetooth.BlueToothGattListener;
 
 import java.util.List;
 
 public class BLEDeviceActivity extends BaseActivity
-        implements OnBlueToothGattListener,
-                    View.OnClickListener{
+        implements BlueToothGattListener,
+                    View.OnClickListener,
+        CharacteristicFragment.CallBackToActivityListener{
 
     private LinearLayout containerLayout;
 
     private Toolbar toolbar;
 
     private ProgressBar progressBar;
+
+    private BluetoothDevice bluetoothDevice;
 
     private BluetoothGattManager bluetoothGattManager;
 
@@ -65,7 +67,7 @@ public class BLEDeviceActivity extends BaseActivity
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
+        bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
 
         bluetoothGattManager = new BluetoothGattManager(bluetoothDevice, this);
 
@@ -82,8 +84,6 @@ public class BLEDeviceActivity extends BaseActivity
     @Override
     public void onServicesDiscovered(BluetoothGatt gatt, int status) {
 
-        Log.i("onServicesDiscovered", "passed");
-
         List<BluetoothGattService> services = gatt.getServices();
 
         for (BluetoothGattService bgs : services) {
@@ -97,6 +97,8 @@ public class BLEDeviceActivity extends BaseActivity
     @Override
     public void onCharacteristicRead(BluetoothGatt gatt,
                                      BluetoothGattCharacteristic characteristic, int status) {
+
+        characteristicFragment.onReadCharacteristicResult(gatt,characteristic, status);
 
     }
 
@@ -179,4 +181,8 @@ public class BLEDeviceActivity extends BaseActivity
 
     }
 
+    @Override
+    public void onReadSubmit(BluetoothGattCharacteristic characteristic) {
+        bluetoothGattManager.readCharacteristic(characteristic);
+    }
 }

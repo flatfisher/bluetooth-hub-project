@@ -3,6 +3,7 @@ package com.liferay.healthcareproject;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 /**
  * Created by flatfisher on 9/24/15.
@@ -41,6 +42,25 @@ public class HandlerManager {
                     public void run() {
 
                         view.setVisibility(status);
+
+                    }
+                });
+            }
+
+        }).start();
+    }
+
+    public static void setText(final TextView textView,final String text){
+
+        new Thread(new Runnable() {
+
+            public void run() {
+
+                textView.post(new Runnable() {
+
+                    public void run() {
+
+                        textView.setText(text);
 
                     }
                 });

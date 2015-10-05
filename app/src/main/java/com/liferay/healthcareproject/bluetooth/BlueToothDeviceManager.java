@@ -23,7 +23,7 @@ public class BlueToothDeviceManager implements BluetoothAdapter.LeScanCallback {
 
     private Context context;
 
-    private OnBlueToothDeviceListener onDeviceListener;
+    private BlueToothDeviceListener onDeviceListener;
 
     private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
@@ -33,7 +33,7 @@ public class BlueToothDeviceManager implements BluetoothAdapter.LeScanCallback {
 
     private List<BluetoothDevice> deviceList;
 
-    public BlueToothDeviceManager(Context context,OnBlueToothDeviceListener listener) {
+    public BlueToothDeviceManager(Context context,BlueToothDeviceListener listener) {
 
         this.context = context;
 

@@ -12,12 +12,12 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.liferay.healthcareproject.bluetooth.BlueToothDeviceManager;
-import com.liferay.healthcareproject.bluetooth.OnBlueToothDeviceListener;
+import com.liferay.healthcareproject.bluetooth.BlueToothDeviceListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScanBLEActivity extends BaseActivity implements OnBlueToothDeviceListener {
+public class ScanBLEActivity extends BaseActivity implements BlueToothDeviceListener {
 
     private RecyclerView deviceRecyclerView;
 

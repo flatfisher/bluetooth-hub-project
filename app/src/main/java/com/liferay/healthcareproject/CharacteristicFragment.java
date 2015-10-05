@@ -1,11 +1,14 @@
 package com.liferay.healthcareproject;
 
 import android.app.Dialog;
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -20,7 +23,7 @@ import com.liferay.healthcareproject.bluetooth.BluetoothGattManager;
  */
 
 public class CharacteristicFragment extends BaseDialogFragment
-        implements View.OnClickListener {
+        implements View.OnClickListener{
 
     private BluetoothGattCharacteristic bluetoothGattCharacteristic;
 
@@ -44,6 +47,12 @@ public class CharacteristicFragment extends BaseDialogFragment
 
     private TextView notifyProperty;
 
+    public interface CallBackToActivityListener {
+        public void onReadSubmit(BluetoothGattCharacteristic characteristic);
+    }
+
+    private CallBackToActivityListener callBackToActivityListener;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
@@ -62,6 +71,36 @@ public class CharacteristicFragment extends BaseDialogFragment
         setValuesOnLayout();
 
         return dialog;
+
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (getActivity() instanceof CallBackToActivityListener){
+            callBackToActivityListener = (CallBackToActivityListener)getActivity();
+        }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        Dialog dialog = getDialog();
+
+        WindowManager.LayoutParams layoutParams = dialog.getWindow().getAttributes();
+
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+
+        int dialogWidth = (int) (metrics.widthPixels * 0.8);
+
+        int dialogHeight = (int) (metrics.heightPixels * 0.8);
+
+        layoutParams.width = dialogWidth;
+
+        layoutParams.height = dialogHeight;
+
+        dialog.getWindow().setAttributes(layoutParams);
 
     }
 
@@ -95,27 +134,29 @@ public class CharacteristicFragment extends BaseDialogFragment
     @Override
     public void onClick(View v) {
 
+        switch (v.getId()) {
+
+            case R.id.read_button:
+                readCharacteristic();
+                break;
+
+            case R.id.write_button:
+
+                break;
+
+            case R.id.notify_button:
+
+                break;
+        }
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    private void readCharacteristic() {
 
-        Dialog dialog = getDialog();
+        if (callBackToActivityListener != null) {
 
-        WindowManager.LayoutParams layoutParams = dialog.getWindow().getAttributes();
+            callBackToActivityListener.onReadSubmit(bluetoothGattCharacteristic);
 
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-
-        int dialogWidth = (int) (metrics.widthPixels * 0.8);
-
-        int dialogHeight = (int) (metrics.heightPixels * 0.8);
-
-        layoutParams.width = dialogWidth;
-
-        layoutParams.height = dialogHeight;
-
-        dialog.getWindow().setAttributes(layoutParams);
+        }
 
     }
 
@@ -126,18 +167,31 @@ public class CharacteristicFragment extends BaseDialogFragment
 
     }
 
-    private void setValuesOnLayout(){
+    @Override
+    public void onReadCharacteristicResult(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+
+        if (status == BluetoothGatt.GATT_SUCCESS) {
+
+            String value = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0).toString();
+
+            HandlerManager.setText(readResultText, value);
+
+        }
+
+    }
+
+    private void setValuesOnLayout() {
 
         String uuid = bluetoothGattCharacteristic.getUuid().toString();
 
         boolean readable = BluetoothGattManager
-                                            .isCharacteristicReadable(bluetoothGattCharacteristic);
+                .isCharacteristicReadable(bluetoothGattCharacteristic);
 
         boolean writable = BluetoothGattManager
-                                            .isCharacteristicWritable(bluetoothGattCharacteristic);
+                .isCharacteristicWritable(bluetoothGattCharacteristic);
 
         boolean notifiable = BluetoothGattManager
-                                        .isCharacteristicNotifiable(bluetoothGattCharacteristic);
+                .isCharacteristicNotifiable(bluetoothGattCharacteristic);
 
         uuidNameText.setText(uuid);
 
@@ -146,6 +200,7 @@ public class CharacteristicFragment extends BaseDialogFragment
         setWritePropertyLayout(writable);
 
         setNotifyPropertyLayout(notifiable);
+
     }
 
     private void setReadPropertyLayout(boolean readable) {
@@ -191,4 +246,5 @@ public class CharacteristicFragment extends BaseDialogFragment
 
         }
     }
+
 }
