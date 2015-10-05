@@ -7,7 +7,7 @@ import android.bluetooth.le.ScanResult;
  * Created by flatfisher on 9/21/15.
  */
 
-public interface OnBlueToothDeviceListener {
+public interface BlueToothDeviceListener {
 
     public void onResult(int callbackType, ScanResult result);
 

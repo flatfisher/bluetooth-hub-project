@@ -6,7 +6,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 /**
  * Created by flatfisher on 9/22/15.
  */
-public interface OnBlueToothGattListener {
+public interface BlueToothGattListener {
 
     public void onServicesDiscovered(BluetoothGatt gatt,int status);
 
