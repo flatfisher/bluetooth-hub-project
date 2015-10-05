@@ -5,11 +5,8 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -23,8 +20,9 @@ import com.liferay.healthcareproject.bluetooth.OnBlueToothGattListener;
 
 import java.util.List;
 
-public class BLEDeviceActivity extends BaseActivity implements
-        OnBlueToothGattListener, View.OnClickListener {
+public class BLEDeviceActivity extends BaseActivity
+        implements OnBlueToothGattListener,
+                    View.OnClickListener{
 
     private LinearLayout containerLayout;
 
@@ -33,6 +31,8 @@ public class BLEDeviceActivity extends BaseActivity implements
     private ProgressBar progressBar;
 
     private BluetoothGattManager bluetoothGattManager;
+
+    private BaseDialogFragment characteristicFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +76,7 @@ public class BLEDeviceActivity extends BaseActivity implements
     }
 
     private void showProgressBar(){
-        HandlerManager.setVisibility(progressBar,View.VISIBLE);
+        HandlerManager.setVisibility(progressBar, View.VISIBLE);
     }
 
     @Override
@@ -142,7 +142,7 @@ public class BLEDeviceActivity extends BaseActivity implements
 
             button.setText(uuid);
 
-            button.setTag(uuid);
+            button.setTag(characteristic);
 
             button.setOnClickListener(this);
 
@@ -155,21 +155,27 @@ public class BLEDeviceActivity extends BaseActivity implements
     }
 
     private void stopProgressBar(){
-        HandlerManager.setVisibility(progressBar,View.GONE);
+        HandlerManager.setVisibility(progressBar, View.GONE);
     }
 
     @Override
-    public void onClick(View v) {
-        showCharacteristicDialog();
+    public void onClick(View view) {
+
+        BluetoothGattCharacteristic characteristic = (BluetoothGattCharacteristic)view.getTag();
+
+        showCharacteristicDialog(characteristic);
+
     }
 
-    private void showCharacteristicDialog() {
+    private void showCharacteristicDialog(BluetoothGattCharacteristic characteristic) {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        DialogFragment characteristicFragment = new CharacteristicFragment();
+        characteristicFragment = new CharacteristicFragment();
 
         characteristicFragment.show(fragmentManager, Constants.CHARACTERISTIC_DIALOG);
+
+        characteristicFragment.onBluetoothGattCharacteristic(characteristic);
 
     }
 

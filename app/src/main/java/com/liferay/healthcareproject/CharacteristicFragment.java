@@ -1,22 +1,28 @@
 package com.liferay.healthcareproject;
 
 import android.app.Dialog;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.util.DisplayMetrics;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.liferay.healthcareproject.bluetooth.BluetoothGattManager;
+
 /**
  * Created by flatfisher on 9/25/15.
  */
 
-public class CharacteristicFragment extends DialogFragment {
+public class CharacteristicFragment extends BaseDialogFragment
+        implements View.OnClickListener {
+
+    private BluetoothGattCharacteristic bluetoothGattCharacteristic;
 
     private TextView uuidNameText;
 
@@ -51,31 +57,43 @@ public class CharacteristicFragment extends DialogFragment {
 
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        setViewById(dialog);
+        initializeLayout(dialog);
+
+        setValuesOnLayout();
 
         return dialog;
 
     }
 
-    private void setViewById(Dialog dialog){
+    private void initializeLayout(Dialog dialog) {
 
-        uuidNameText = (TextView)dialog.findViewById(R.id.uuid_name_text);
+        uuidNameText = (TextView) dialog.findViewById(R.id.uuid_name_text);
 
-        readResultText = (TextView)dialog.findViewById(R.id.read_text);
+        readResultText = (TextView) dialog.findViewById(R.id.read_text);
 
-        writeEditText = (EditText)dialog.findViewById(R.id.writ_edit);
+        writeEditText = (EditText) dialog.findViewById(R.id.writ_edit);
 
-        notifyResultText = (TextView)dialog.findViewById(R.id.notify_text);
+        notifyResultText = (TextView) dialog.findViewById(R.id.notify_text);
 
-        readButton = (Button)dialog.findViewById(R.id.read_button);
+        readButton = (Button) dialog.findViewById(R.id.read_button);
+        readButton.setOnClickListener(this);
 
-        writeButton = (Button)dialog.findViewById(R.id.write_button);
+        writeButton = (Button) dialog.findViewById(R.id.write_button);
+        writeButton.setOnClickListener(this);
 
-        readProperty = (TextView)dialog.findViewById(R.id.property_read);
+        notifyButton = (Button) dialog.findViewById(R.id.notify_button);
+        notifyButton.setOnClickListener(this);
 
-        writeProperty = (TextView)dialog.findViewById(R.id.property_write);
+        readProperty = (TextView) dialog.findViewById(R.id.property_read);
 
-        notifyProperty = (TextView)dialog.findViewById(R.id.property_notify);
+        writeProperty = (TextView) dialog.findViewById(R.id.property_write);
+
+        notifyProperty = (TextView) dialog.findViewById(R.id.property_notify);
+
+    }
+
+    @Override
+    public void onClick(View v) {
 
     }
 
@@ -100,5 +118,77 @@ public class CharacteristicFragment extends DialogFragment {
         dialog.getWindow().setAttributes(layoutParams);
 
     }
-    
+
+    @Override
+    public void onBluetoothGattCharacteristic(BluetoothGattCharacteristic characteristic) {
+
+        bluetoothGattCharacteristic = characteristic;
+
+    }
+
+    private void setValuesOnLayout(){
+
+        String uuid = bluetoothGattCharacteristic.getUuid().toString();
+
+        boolean readable = BluetoothGattManager
+                                            .isCharacteristicReadable(bluetoothGattCharacteristic);
+
+        boolean writable = BluetoothGattManager
+                                            .isCharacteristicWritable(bluetoothGattCharacteristic);
+
+        boolean notifiable = BluetoothGattManager
+                                        .isCharacteristicNotifiable(bluetoothGattCharacteristic);
+
+        uuidNameText.setText(uuid);
+
+        setReadPropertyLayout(readable);
+
+        setWritePropertyLayout(writable);
+
+        setNotifyPropertyLayout(notifiable);
+    }
+
+    private void setReadPropertyLayout(boolean readable) {
+
+        if (readable) {
+
+            readProperty.setVisibility(View.VISIBLE);
+
+        } else {
+
+            readResultText.setEnabled(false);
+
+            readButton.setEnabled(false);
+        }
+    }
+
+    private void setWritePropertyLayout(boolean writable) {
+
+        if (writable) {
+
+            writeProperty.setVisibility(View.VISIBLE);
+
+        } else {
+
+            writeEditText.setEnabled(false);
+
+            writeButton.setEnabled(false);
+
+        }
+    }
+
+    private void setNotifyPropertyLayout(boolean notifiable) {
+
+        if (notifiable) {
+
+            notifyProperty.setVisibility(View.VISIBLE);
+
+        } else {
+
+            notifyResultText.setEnabled(false);
+
+            notifyButton.setEnabled(false);
+
+        }
+    }
 }
