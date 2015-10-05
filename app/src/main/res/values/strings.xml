@@ -1,4 +1,8 @@
 <resources>
+
+    <string name="start_notification">Notify</string>
+    <string name="stop_notification">Stop</string>
+
     <string name="app_name">HealthCareProject</string>
 
     <string name="hello_world">Hello world!</string>
@@ -35,4 +39,5 @@
     <string name="title_activity_situcale">SITUCALEActivity</string>
     <string name="title_activity_scan_ble">ScanBLEActivity</string>
     <string name="title_activity_bledevice">BLEDeviceActivity</string>
+
 </resources>

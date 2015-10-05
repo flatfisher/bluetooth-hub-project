@@ -12,9 +12,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
     public abstract void onReadCharacteristicResult(
                         BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status);
 
-    public abstract void onCharacteristicWrite(BluetoothGatt gatt,
-                        BluetoothGattCharacteristic characteristic, int status);
-
-
+    public abstract void onNotifyResult(BluetoothGatt gatt,
+                                        BluetoothGattCharacteristic characteristic);
 
 }

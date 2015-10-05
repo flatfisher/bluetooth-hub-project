@@ -106,6 +106,8 @@ public class BLEDeviceActivity extends BaseActivity
     public void onCharacteristicChanged(BluetoothGatt gatt,
                                         BluetoothGattCharacteristic characteristic) {
 
+        characteristicFragment.onNotifyResult(gatt,characteristic);
+
     }
 
     @Override
@@ -193,6 +195,6 @@ public class BLEDeviceActivity extends BaseActivity
 
     @Override
     public void onNotifySubmit(BluetoothGattCharacteristic characteristic, boolean enable) {
-
+        bluetoothGattManager.notifyCharacteristic(characteristic,enable);
     }
 }

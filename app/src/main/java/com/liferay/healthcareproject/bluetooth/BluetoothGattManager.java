@@ -87,27 +87,31 @@ public class BluetoothGattManager extends BluetoothGattCallback {
 
     }
 
-    public void notifyCharacteristic(String serviceUuid, String characteristicUuid, boolean enable) {
+    public void notifyCharacteristic(BluetoothGattCharacteristic characteristic, boolean enable) {
 
         Log.i("notifyCharacteristic", "passed");
 
         if (bluetoothGatt != null) {
 
-            BluetoothGattService service = bluetoothGatt.getService(UUID.fromString(serviceUuid));
+            UUID serviceUuid = characteristic.getService().getUuid();
+
+            BluetoothGattService service = bluetoothGatt.getService(serviceUuid);
 
             if (service != null) {
 
-                BluetoothGattCharacteristic characteristic =
-                        service.getCharacteristic(UUID.fromString(characteristicUuid));
+                UUID characteristicUuid = characteristic.getUuid();
 
-                if (characteristic != null) {
+                BluetoothGattCharacteristic bluetoothGattCharacteristic = service
+                        .getCharacteristic(characteristicUuid);
+
+                if (bluetoothGattCharacteristic != null) {
                     boolean notify = bluetoothGatt
-                                        .setCharacteristicNotification(characteristic, enable);
+                                        .setCharacteristicNotification(bluetoothGattCharacteristic, enable);
 
                     if (notify) {
-                        for (BluetoothGattDescriptor bgd : characteristic.getDescriptors()) {
+                        for (BluetoothGattDescriptor bgd : bluetoothGattCharacteristic.getDescriptors()) {
 
-                            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
+                            BluetoothGattDescriptor descriptor = bluetoothGattCharacteristic.getDescriptor(
                                     UUID.fromString(bgd.getUuid().toString()));
 
                             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
@@ -163,7 +167,7 @@ public class BluetoothGattManager extends BluetoothGattCallback {
                                         BluetoothGattCharacteristic characteristic) {
         super.onCharacteristicChanged(gatt, characteristic);
 
-        Log.i("onCharacteristicChanged", "passed");
+        Log.i("onNotifyResult", "passed");
 
         onBlueToothGattListener.onCharacteristicChanged(gatt, characteristic);
 

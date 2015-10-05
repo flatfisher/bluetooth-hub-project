@@ -147,7 +147,7 @@ public class CharacteristicFragment extends BaseDialogFragment
                 break;
 
             case R.id.notify_button:
-
+                notifyCharacteristic();
                 break;
         }
     }
@@ -197,6 +197,34 @@ public class CharacteristicFragment extends BaseDialogFragment
 
     }
 
+    private void notifyCharacteristic(){
+
+        boolean enable = true;
+
+        String applyStatus = notifyButton.getText().toString();
+
+        if (applyStatus.equals(getString(R.string.start_notification))){
+
+            enable = true;
+
+            notifyButton.setText(getString(R.string.stop_notification));
+
+        }else if(applyStatus.equals(getString(R.string.stop_notification))){
+
+            enable = false;
+
+            notifyButton.setText(getString(R.string.start_notification));
+
+        }
+
+        if (callBackToActivityListener != null) {
+
+            callBackToActivityListener.onNotifySubmit(bluetoothGattCharacteristic,enable);
+
+        }
+
+    }
+
     @Override
     public void onBluetoothGattCharacteristic(BluetoothGattCharacteristic characteristic) {
 
@@ -205,11 +233,13 @@ public class CharacteristicFragment extends BaseDialogFragment
     }
 
     @Override
-    public void onReadCharacteristicResult(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+    public void onReadCharacteristicResult(BluetoothGatt gatt,
+                                           BluetoothGattCharacteristic characteristic, int status) {
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
 
-            String value = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0).toString();
+            String value = characteristic.
+                    getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0).toString();
 
             HandlerManager.setText(readResultText, value);
 
@@ -218,7 +248,11 @@ public class CharacteristicFragment extends BaseDialogFragment
     }
 
     @Override
-    public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+    public void onNotifyResult(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+
+            String value = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0).toString();
+
+            HandlerManager.setText(notifyResultText, value);
 
     }
 
