@@ -14,11 +14,11 @@ import java.util.UUID;
 
 public class BluetoothGattManager extends BluetoothGattCallback {
 
-    private OnBlueToothGattListener onBlueToothGattListener;
+    private BlueToothGattListener onBlueToothGattListener;
     private BluetoothDevice bluetoothDevice;
     private BluetoothGatt bluetoothGatt;
 
-    public BluetoothGattManager(BluetoothDevice bluetoothDevice,OnBlueToothGattListener listener) {
+    public BluetoothGattManager(BluetoothDevice bluetoothDevice,BlueToothGattListener listener) {
         super();
 
         this.bluetoothDevice = bluetoothDevice;
@@ -31,25 +31,28 @@ public class BluetoothGattManager extends BluetoothGattCallback {
         bluetoothDevice.connectGatt(context, autoConnect, this);
     }
 
-    public void readCharacteristic(String serviceUuid, String characteristicUuid) {
+    public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
 
         Log.i("readCharacteristic", "passed");
 
         if (bluetoothGatt != null) {
 
-            BluetoothGattService service = bluetoothGatt.getService(UUID.fromString(serviceUuid));
+            UUID serviceUuid = characteristic.getService().getUuid();
+
+            BluetoothGattService service = bluetoothGatt.getService(serviceUuid);
 
             if (service != null) {
 
-                BluetoothGattCharacteristic characteristic = service
-                                            .getCharacteristic(UUID.fromString(characteristicUuid));
+                UUID characteristicUuid = characteristic.getUuid();
 
-                if (characteristic != null) {
-                    bluetoothGatt.readCharacteristic(characteristic);
+                BluetoothGattCharacteristic bluetoothGattCharacteristic = service
+                        .getCharacteristic(characteristicUuid);
+
+                if (bluetoothGattCharacteristic != null) {
+                    bluetoothGatt.readCharacteristic(bluetoothGattCharacteristic);
                 }
             }
         }
-
     }
 
     public void writeCharacteristic(byte[] value, String serviceUuid, String characteristicUuid) {
@@ -161,7 +164,7 @@ public class BluetoothGattManager extends BluetoothGattCallback {
 
     public static boolean isCharacteristicWritable(BluetoothGattCharacteristic characteristic) {
         if ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_WRITE |
-                BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) !=0){
+                characteristic.getProperties() &   BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) !=0){
             return true;
         }else {
             return false;
