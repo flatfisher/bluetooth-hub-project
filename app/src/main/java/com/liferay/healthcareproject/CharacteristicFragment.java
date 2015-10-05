@@ -23,7 +23,7 @@ import com.liferay.healthcareproject.bluetooth.BluetoothGattManager;
  */
 
 public class CharacteristicFragment extends BaseDialogFragment
-        implements View.OnClickListener{
+        implements View.OnClickListener {
 
     private BluetoothGattCharacteristic bluetoothGattCharacteristic;
 
@@ -49,8 +49,10 @@ public class CharacteristicFragment extends BaseDialogFragment
 
     public interface CallBackToActivityListener {
         public void onReadSubmit(BluetoothGattCharacteristic characteristic);
-        public void onWriteSubmit(BluetoothGattCharacteristic characteristic,byte[] value);
-        public void onNotifySubmit(BluetoothGattCharacteristic characteristic,boolean enable);
+
+        public void onWriteSubmit(BluetoothGattCharacteristic characteristic, byte[] value);
+
+        public void onNotifySubmit(BluetoothGattCharacteristic characteristic, boolean enable);
     }
 
     private CallBackToActivityListener callBackToActivityListener;
@@ -79,8 +81,8 @@ public class CharacteristicFragment extends BaseDialogFragment
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (getActivity() instanceof CallBackToActivityListener){
-            callBackToActivityListener = (CallBackToActivityListener)getActivity();
+        if (getActivity() instanceof CallBackToActivityListener) {
+            callBackToActivityListener = (CallBackToActivityListener) getActivity();
         }
     }
 
@@ -166,7 +168,7 @@ public class CharacteristicFragment extends BaseDialogFragment
 
         String enterCode = writeEditText.getText().toString();
 
-        if (enterCode!=null) {
+        if (enterCode != null) {
 
             byte[] value = hexStringToByteArray(enterCode);
 
@@ -197,19 +199,19 @@ public class CharacteristicFragment extends BaseDialogFragment
 
     }
 
-    private void notifyCharacteristic(){
+    private void notifyCharacteristic() {
 
         boolean enable = true;
 
         String applyStatus = notifyButton.getText().toString();
 
-        if (applyStatus.equals(getString(R.string.start_notification))){
+        if (applyStatus.equals(getString(R.string.start_notification))) {
 
             enable = true;
 
             notifyButton.setText(getString(R.string.stop_notification));
 
-        }else if(applyStatus.equals(getString(R.string.stop_notification))){
+        } else if (applyStatus.equals(getString(R.string.stop_notification))) {
 
             enable = false;
 
@@ -219,7 +221,7 @@ public class CharacteristicFragment extends BaseDialogFragment
 
         if (callBackToActivityListener != null) {
 
-            callBackToActivityListener.onNotifySubmit(bluetoothGattCharacteristic,enable);
+            callBackToActivityListener.onNotifySubmit(bluetoothGattCharacteristic, enable);
 
         }
 
@@ -238,10 +240,20 @@ public class CharacteristicFragment extends BaseDialogFragment
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
 
-            String value = characteristic.
-                    getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0).toString();
+            byte[] resultData = characteristic.getValue();
 
-            HandlerManager.setText(readResultText, value);
+            final StringBuilder stringBuilder = new StringBuilder(resultData.length);
+
+            if (resultData != null && resultData.length > 0) {
+
+                for (byte byteChar : resultData) {
+
+                    stringBuilder.append(String.format("%02X", byteChar));
+
+                }
+            }
+
+            HandlerManager.setText(readResultText, stringBuilder.toString());
 
         }
 
@@ -250,9 +262,20 @@ public class CharacteristicFragment extends BaseDialogFragment
     @Override
     public void onNotifyResult(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
 
-            String value = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0).toString();
+        byte[] resultData = characteristic.getValue();
 
-            HandlerManager.setText(notifyResultText, value);
+        final StringBuilder stringBuilder = new StringBuilder(resultData.length);
+
+        if (resultData != null && resultData.length > 0) {
+
+            for (byte byteChar : resultData) {
+
+                stringBuilder.append(String.format("%02X", byteChar));
+
+            }
+        }
+
+        HandlerManager.setText(notifyResultText, stringBuilder.toString());
 
     }
 
