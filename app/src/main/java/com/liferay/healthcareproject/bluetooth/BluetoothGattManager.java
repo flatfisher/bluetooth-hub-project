@@ -55,23 +55,31 @@ public class BluetoothGattManager extends BluetoothGattCallback {
         }
     }
 
-    public void writeCharacteristic(byte[] value, String serviceUuid, String characteristicUuid) {
+    public void writeCharacteristic(BluetoothGattCharacteristic characteristic,byte[] value) {
 
         Log.i("writeCharacteristic", "passed");
 
         if (bluetoothGatt != null) {
 
-            BluetoothGattService service = bluetoothGatt.getService(UUID.fromString(serviceUuid));
+            UUID serviceUuid = characteristic.getService().getUuid();
+
+            BluetoothGattService service = bluetoothGatt.getService(serviceUuid);
 
             if (service != null) {
 
-                BluetoothGattCharacteristic characteristic = service
-                                            .getCharacteristic(UUID.fromString(characteristicUuid));
+                UUID characteristicUuid = characteristic.getUuid();
 
-                if (characteristic != null) {
-                    characteristic.setValue(value);
-                    boolean status = bluetoothGatt.writeCharacteristic(characteristic);
+                BluetoothGattCharacteristic bluetoothGattCharacteristic = service
+                        .getCharacteristic(characteristicUuid);
+
+                if (bluetoothGattCharacteristic != null) {
+
+                    bluetoothGattCharacteristic.setValue(value);
+
+                    boolean status = bluetoothGatt.writeCharacteristic(bluetoothGattCharacteristic);
+
                     Log.i("writeStatus", "" + status);
+
                 }
 
             }

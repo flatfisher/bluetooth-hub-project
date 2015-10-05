@@ -49,6 +49,8 @@ public class CharacteristicFragment extends BaseDialogFragment
 
     public interface CallBackToActivityListener {
         public void onReadSubmit(BluetoothGattCharacteristic characteristic);
+        public void onWriteSubmit(BluetoothGattCharacteristic characteristic,byte[] value);
+        public void onNotifySubmit(BluetoothGattCharacteristic characteristic,boolean enable);
     }
 
     private CallBackToActivityListener callBackToActivityListener;
@@ -141,7 +143,7 @@ public class CharacteristicFragment extends BaseDialogFragment
                 break;
 
             case R.id.write_button:
-
+                writeCharacteristic();
                 break;
 
             case R.id.notify_button:
@@ -157,6 +159,41 @@ public class CharacteristicFragment extends BaseDialogFragment
             callBackToActivityListener.onReadSubmit(bluetoothGattCharacteristic);
 
         }
+
+    }
+
+    private void writeCharacteristic() {
+
+        String enterCode = writeEditText.getText().toString();
+
+        if (enterCode!=null) {
+
+            byte[] value = hexStringToByteArray(enterCode);
+
+            if (callBackToActivityListener != null) {
+
+                callBackToActivityListener.onWriteSubmit(bluetoothGattCharacteristic, value);
+
+            }
+
+        }
+
+    }
+
+    private byte[] hexStringToByteArray(String s) {
+
+        int len = s.length();
+
+        byte[] data = new byte[len / 2];
+
+        for (int i = 0; i < len; i += 2) {
+
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character
+                    .digit(s.charAt(i + 1), 16));
+
+        }
+
+        return data;
 
     }
 
@@ -177,6 +214,11 @@ public class CharacteristicFragment extends BaseDialogFragment
             HandlerManager.setText(readResultText, value);
 
         }
+
+    }
+
+    @Override
+    public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
 
     }
 

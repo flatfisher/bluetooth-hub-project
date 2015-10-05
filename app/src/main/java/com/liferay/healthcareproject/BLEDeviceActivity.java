@@ -185,4 +185,14 @@ public class BLEDeviceActivity extends BaseActivity
     public void onReadSubmit(BluetoothGattCharacteristic characteristic) {
         bluetoothGattManager.readCharacteristic(characteristic);
     }
+
+    @Override
+    public void onWriteSubmit(BluetoothGattCharacteristic characteristic, byte[] value) {
+        bluetoothGattManager.writeCharacteristic(characteristic,value);
+    }
+
+    @Override
+    public void onNotifySubmit(BluetoothGattCharacteristic characteristic, boolean enable) {
+
+    }
 }
