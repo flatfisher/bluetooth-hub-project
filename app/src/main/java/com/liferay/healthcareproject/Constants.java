@@ -8,7 +8,5 @@ public class Constants {
     public static String REQUEST_URL = "";
 
     public final static String CHARACTERISTIC_DIALOG = "characteristic_dialog";
-
-    public final static String UUID_BUNDLE = "uuid_bundle";
-
+    
 }
