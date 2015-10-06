@@ -8,15 +8,23 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.android.volley.Response;
 import com.liferay.healthcareproject.bluetooth.BluetoothGattManager;
+import com.liferay.healthcareproject.network.PostManager;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by flatfisher on 9/25/15.
@@ -47,12 +55,26 @@ public class CharacteristicFragment extends BaseDialogFragment
 
     private TextView notifyProperty;
 
+    private LoggingTimerTask loggingTimerTask;
+
+    private Timer timer;
+
+    public final static String INTERVAL_10 = "10 sec.";
+
+    public final static String INTERVAL_20 = "20 sec.";
+
+    public final static String INTERVAL_30 = "30 sec.";
+
+    private Spinner loggingIntervalSpinner;
+
     public interface CallBackToActivityListener {
+
         public void onReadSubmit(BluetoothGattCharacteristic characteristic);
 
         public void onWriteSubmit(BluetoothGattCharacteristic characteristic, byte[] value);
 
         public void onNotifySubmit(BluetoothGattCharacteristic characteristic, boolean enable);
+
     }
 
     private CallBackToActivityListener callBackToActivityListener;
@@ -66,6 +88,7 @@ public class CharacteristicFragment extends BaseDialogFragment
 
         dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+
         dialog.setContentView(R.layout.fragment_characteristic);
 
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -119,12 +142,15 @@ public class CharacteristicFragment extends BaseDialogFragment
         notifyResultText = (TextView) dialog.findViewById(R.id.notify_text);
 
         readButton = (Button) dialog.findViewById(R.id.read_button);
+
         readButton.setOnClickListener(this);
 
         writeButton = (Button) dialog.findViewById(R.id.write_button);
+
         writeButton.setOnClickListener(this);
 
         notifyButton = (Button) dialog.findViewById(R.id.notify_button);
+
         notifyButton.setOnClickListener(this);
 
         readProperty = (TextView) dialog.findViewById(R.id.property_read);
@@ -133,6 +159,7 @@ public class CharacteristicFragment extends BaseDialogFragment
 
         notifyProperty = (TextView) dialog.findViewById(R.id.property_notify);
 
+        loggingIntervalSpinner = (Spinner) dialog.findViewById(R.id.logging_interval);
     }
 
     @Override
@@ -223,6 +250,57 @@ public class CharacteristicFragment extends BaseDialogFragment
 
             callBackToActivityListener.onNotifySubmit(bluetoothGattCharacteristic, enable);
 
+            if (enable) {
+
+                startLogging();
+
+            } else {
+
+                stopLogging();
+
+            }
+
+        }
+
+    }
+
+    private void startLogging() {
+
+        String selectInterval = (String) loggingIntervalSpinner.getSelectedItem();
+
+        if (selectInterval.equals(INTERVAL_10)) {
+
+            setLoggingTimer(10000);
+
+        } else if (selectInterval.equals(INTERVAL_20)) {
+
+            setLoggingTimer(20000);
+
+        } else if (selectInterval.equals(INTERVAL_30)) {
+
+            setLoggingTimer(30000);
+
+        }
+    }
+
+    private void setLoggingTimer(long delay) {
+
+        loggingTimerTask = new LoggingTimerTask();
+
+        timer = new Timer(true);
+
+        timer.schedule(loggingTimerTask, delay, delay);
+
+    }
+
+    private void stopLogging() {
+
+        if (timer != null) {
+
+            timer.cancel();
+
+            timer = null;
+
         }
 
     }
@@ -300,6 +378,8 @@ public class CharacteristicFragment extends BaseDialogFragment
 
         setNotifyPropertyLayout(notifiable);
 
+        setUpIntervalSpinner();
+
     }
 
     private void setReadPropertyLayout(boolean readable) {
@@ -337,6 +417,9 @@ public class CharacteristicFragment extends BaseDialogFragment
 
             notifyProperty.setVisibility(View.VISIBLE);
 
+            loggingIntervalSpinner.setVisibility(View.VISIBLE);
+
+
         } else {
 
             notifyResultText.setEnabled(false);
@@ -346,4 +429,66 @@ public class CharacteristicFragment extends BaseDialogFragment
         }
     }
 
+    private void setUpIntervalSpinner() {
+        ArrayAdapter<String> adapter =
+                new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        adapter.add("No log.");
+
+        adapter.add(INTERVAL_10);
+
+        adapter.add(INTERVAL_20);
+
+        adapter.add(INTERVAL_30);
+
+        loggingIntervalSpinner.setAdapter(adapter);
+
+    }
+
+    class LoggingTimerTask extends TimerTask implements PostManager.ResponseListener{
+
+        private PostManager postManager;
+
+        public LoggingTimerTask(){
+
+            postManager =  new PostManager(getActivity(),Constants.REQUEST_URL,this);
+
+        }
+
+        @Override
+        public void run() {
+
+            loggingToServer();
+
+        }
+
+        @Override
+        public Response.Listener<String> onResponse(String response) {
+            return null;
+        }
+
+        @Override
+        public Response.ErrorListener onErrorResponse() {
+            return null;
+        }
+
+        private void loggingToServer(){
+
+            Map<String,String> params = new HashMap<String, String>();
+
+            String value = notifyResultText.getText().toString();
+
+            if (value!=null){
+
+                params.put("value",value);
+
+                postManager.connect(params);
+
+            }
+
+        }
+
+    }
 }
