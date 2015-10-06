@@ -331,7 +331,7 @@ public class CharacteristicFragment extends BaseDialogFragment
                 }
             }
 
-            HandlerManager.setText(readResultText, stringBuilder.toString());
+            ViewThreadHandler.setText(readResultText, stringBuilder.toString());
 
         }
 
@@ -353,7 +353,7 @@ public class CharacteristicFragment extends BaseDialogFragment
             }
         }
 
-        HandlerManager.setText(notifyResultText, stringBuilder.toString());
+        ViewThreadHandler.setText(notifyResultText, stringBuilder.toString());
 
     }
 

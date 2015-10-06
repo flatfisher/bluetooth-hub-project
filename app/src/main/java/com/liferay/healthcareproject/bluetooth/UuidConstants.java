@@ -6,7 +6,7 @@ package com.liferay.healthcareproject.bluetooth;
 public class UuidConstants {
 
     public static final String BATTERY_SERVICE =  "0000180f-0000-1000-8000-00805f9b34fb";
-    public static final String BATTERY_LEVEL =  "00002a19-0000-1000-8000-00805f9b34fb";
+    public static final String BATTERY_LEVEL =    "00002a19-0000-1000-8000-00805f9b34fb";
 
     public static final String ACCELEROMETER_SERVICE =  "0000aa10-0000-1000-8000-00805f9b34fb";
     public static final String ACC_GEN_CFG =  "0000aa11-0000-1000-8000-00805f9b34fb";
