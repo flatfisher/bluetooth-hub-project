@@ -8,9 +8,9 @@ import android.widget.TextView;
 /**
  * Created by flatfisher on 9/24/15.
  */
-public class HandlerManager {
+public class ViewThreadHandler {
 
-    private HandlerManager(){}
+    private ViewThreadHandler(){}
 
     public static void addView(final ViewGroup viewGroup,final View view){
 
