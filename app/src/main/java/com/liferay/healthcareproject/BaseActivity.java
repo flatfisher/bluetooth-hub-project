@@ -10,4 +10,5 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected final static String ADDRESS_INTENT = "address_intent";
 
+    protected final static String DEVICE_NAME_INTENT = "device_name_intent";
 }

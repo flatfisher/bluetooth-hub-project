@@ -13,16 +13,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setToolbar();
-
         startActivity(new Intent(this, ScanBLEActivity.class));
-    }
-
-    private void setToolbar() {
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
-
-        toolbar.setNavigationIcon(android.R.drawable.ic_popup_sync);
 
     }
 

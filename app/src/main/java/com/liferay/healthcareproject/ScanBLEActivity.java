@@ -61,12 +61,17 @@ public class ScanBLEActivity extends BaseActivity implements BlueToothDeviceList
                             public void onItemClick(View view, int position) {
 
                                 String name = scanResultList.get(position)
+                                        .getDevice().getName();
+                               
+                                String address = scanResultList.get(position)
                                         .getDevice().getAddress();
 
                                 Intent intent = new Intent(ScanBLEActivity.this,
                                         BLEDeviceActivity.class);
 
-                                intent.putExtra(ADDRESS_INTENT, name);
+                                intent.putExtra(DEVICE_NAME_INTENT,name);
+
+                                intent.putExtra(ADDRESS_INTENT, address);
 
                                 startActivity(intent);
 
@@ -78,7 +83,9 @@ public class ScanBLEActivity extends BaseActivity implements BlueToothDeviceList
     }
 
     private void setValueToDeviceRecyclerView(){
+
         deviceRecyclerView.setAdapter(new DeviceRecyclerViewAdapter(this, scanResultList));
+
     }
 
     private void setToolbar() {

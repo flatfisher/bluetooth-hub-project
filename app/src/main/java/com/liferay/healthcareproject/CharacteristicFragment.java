@@ -71,7 +71,7 @@ public class CharacteristicFragment extends BaseDialogFragment
 
         public void onReadSubmit(BluetoothGattCharacteristic characteristic);
 
-        public void onWriteSubmit(BluetoothGattCharacteristic characteristic, byte[] value);
+        public void onWriteSubmit(BluetoothGattCharacteristic characteristic, String value);
 
         public void onNotifySubmit(BluetoothGattCharacteristic characteristic, boolean enable);
 
@@ -197,32 +197,13 @@ public class CharacteristicFragment extends BaseDialogFragment
 
         if (enterCode != null) {
 
-            byte[] value = hexStringToByteArray(enterCode);
-
             if (callBackToActivityListener != null) {
 
-                callBackToActivityListener.onWriteSubmit(bluetoothGattCharacteristic, value);
+                callBackToActivityListener.onWriteSubmit(bluetoothGattCharacteristic, enterCode);
 
             }
 
         }
-
-    }
-
-    private byte[] hexStringToByteArray(String s) {
-
-        int len = s.length();
-
-        byte[] data = new byte[len / 2];
-
-        for (int i = 0; i < len; i += 2) {
-
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character
-                    .digit(s.charAt(i + 1), 16));
-
-        }
-
-        return data;
 
     }
 
@@ -318,20 +299,9 @@ public class CharacteristicFragment extends BaseDialogFragment
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
 
-            byte[] resultData = characteristic.getValue();
+            String value = BluetoothGattManager.getCharacteristicValue(characteristic);
 
-            final StringBuilder stringBuilder = new StringBuilder(resultData.length);
-
-            if (resultData != null && resultData.length > 0) {
-
-                for (byte byteChar : resultData) {
-
-                    stringBuilder.append(String.format("%02X", byteChar));
-
-                }
-            }
-
-            ViewThreadHandler.setText(readResultText, stringBuilder.toString());
+            ViewThreadHandler.setText(readResultText, value);
 
         }
 
@@ -340,20 +310,9 @@ public class CharacteristicFragment extends BaseDialogFragment
     @Override
     public void onNotifyResult(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
 
-        byte[] resultData = characteristic.getValue();
+        String value = BluetoothGattManager.getCharacteristicValue(characteristic);
 
-        final StringBuilder stringBuilder = new StringBuilder(resultData.length);
-
-        if (resultData != null && resultData.length > 0) {
-
-            for (byte byteChar : resultData) {
-
-                stringBuilder.append(String.format("%02X", byteChar));
-
-            }
-        }
-
-        ViewThreadHandler.setText(notifyResultText, stringBuilder.toString());
+        ViewThreadHandler.setText(notifyResultText,value);
 
     }
 

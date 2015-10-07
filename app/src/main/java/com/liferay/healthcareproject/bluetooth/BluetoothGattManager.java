@@ -18,7 +18,7 @@ public class BluetoothGattManager extends BluetoothGattCallback {
     private BluetoothDevice bluetoothDevice;
     private BluetoothGatt bluetoothGatt;
 
-    public BluetoothGattManager(BluetoothDevice bluetoothDevice,BlueToothGattListener listener) {
+    public BluetoothGattManager(BluetoothDevice bluetoothDevice, BlueToothGattListener listener) {
         super();
 
         this.bluetoothDevice = bluetoothDevice;
@@ -55,7 +55,13 @@ public class BluetoothGattManager extends BluetoothGattCallback {
         }
     }
 
-    public void writeCharacteristic(BluetoothGattCharacteristic characteristic,byte[] value) {
+    public void writeCharacteristic(BluetoothGattCharacteristic characteristic, String value) {
+
+        writeCharacteristic(characteristic, hexStringToByteArray(value));
+
+    }
+
+    public void writeCharacteristic(BluetoothGattCharacteristic characteristic, byte[] value) {
 
         Log.i("writeCharacteristic", "passed");
 
@@ -87,6 +93,23 @@ public class BluetoothGattManager extends BluetoothGattCallback {
 
     }
 
+    private byte[] hexStringToByteArray(String string) {
+
+        int len = string.length();
+
+        byte[] data = new byte[len / 2];
+
+        for (int i = 0; i < len; i += 2) {
+
+            data[i / 2] = (byte) ((Character.digit(string.charAt(i), 16) << 4) + Character
+                    .digit(string.charAt(i + 1), 16));
+
+        }
+
+        return data;
+
+    }
+
     public void notifyCharacteristic(BluetoothGattCharacteristic characteristic, boolean enable) {
 
         Log.i("notifyCharacteristic", "passed");
@@ -106,7 +129,7 @@ public class BluetoothGattManager extends BluetoothGattCallback {
 
                 if (bluetoothGattCharacteristic != null) {
                     boolean notify = bluetoothGatt
-                                        .setCharacteristicNotification(bluetoothGattCharacteristic, enable);
+                            .setCharacteristicNotification(bluetoothGattCharacteristic, enable);
 
                     if (notify) {
                         for (BluetoothGattDescriptor bgd : bluetoothGattCharacteristic.getDescriptors()) {
@@ -174,28 +197,46 @@ public class BluetoothGattManager extends BluetoothGattCallback {
     }
 
     public static boolean isCharacteristicReadable(BluetoothGattCharacteristic characteristic) {
-        if ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_READ) != 0){
+        if ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_READ) != 0) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
 
     public static boolean isCharacteristicWritable(BluetoothGattCharacteristic characteristic) {
         if ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_WRITE |
-                characteristic.getProperties() &   BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) !=0){
+                characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
 
     public static boolean isCharacteristicNotifiable(BluetoothGattCharacteristic characteristic) {
-        if ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0){
+        if ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0) {
             return true;
-        }else {
+        } else {
             return false;
         }
+    }
+
+    public static String getCharacteristicValue(BluetoothGattCharacteristic characteristic){
+
+        byte[] resultData = characteristic.getValue();
+
+        final StringBuilder stringBuilder = new StringBuilder(resultData.length);
+
+        if (resultData != null && resultData.length > 0) {
+
+            for (byte byteChar : resultData) {
+
+                stringBuilder.append(String.format("%02X", byteChar));
+
+            }
+        }
+
+        return stringBuilder.toString();
     }
 
 }
