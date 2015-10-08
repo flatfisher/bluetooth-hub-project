@@ -20,35 +20,25 @@ import java.util.Map;
  */
 
 
-public class PostManager implements Response.Listener<String>, Response.ErrorListener {
+public abstract class PostManager implements Response.Listener<String>, Response.ErrorListener {
 
     private Context context;
 
     private RequestQueue requestQueue;
-    private ResponseListener responseListener;
     private String POST_URL;
     private String POST_TAG;
 
     private Toolbar toolbar;
     private ProgressBar materialProgressBar;
 
-    public interface ResponseListener {
-
-        public Response.Listener<String> onResponse(String response);
-
-        public Response.ErrorListener onErrorResponse();
-
-    }
-
-    public PostManager(Context context, String posturl, ResponseListener responseListener) {
+    public PostManager(Context context, String postUrl) {
 
         this.context = context;
 
-        POST_URL = posturl;
+        POST_URL = postUrl;
 
-        POST_TAG = posturl;
+        POST_TAG = postUrl;
 
-        this.responseListener = responseListener;
     }
 
     public void setMaterialProgressBar(Toolbar toolbar) {
@@ -101,8 +91,6 @@ public class PostManager implements Response.Listener<String>, Response.ErrorLis
 
     @Override
     public void onResponse(String response) {
-
-        responseListener.onResponse(response);
         if (toolbar != null) {
             stopProgressBar();
         }
@@ -111,8 +99,6 @@ public class PostManager implements Response.Listener<String>, Response.ErrorLis
 
     @Override
     public void onErrorResponse(VolleyError error) {
-
-        responseListener.onErrorResponse();
 
         if (toolbar != null) {
             stopProgressBar();

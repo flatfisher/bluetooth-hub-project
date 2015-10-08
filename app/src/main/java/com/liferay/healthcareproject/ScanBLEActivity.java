@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -132,6 +133,9 @@ public class ScanBLEActivity extends BaseActivity implements BlueToothDeviceList
     @Override
     public void onResult(int callbackType, ScanResult result) {
 
+        Log.i("scanOnResult","passed");
+
+
         if (!isOverLap(result)){
 
             scanResultList.add(result);
@@ -162,6 +166,7 @@ public class ScanBLEActivity extends BaseActivity implements BlueToothDeviceList
 
     @Override
     public void onFinish() {
+        Log.i("scanOnFinish","passed");
         stopProgressBar();
     }
 

@@ -7,49 +7,40 @@ import java.util.List;
  */
 public class UuidMethodManager {
 
-    public final static int READ_METHOD = 0;
-
-    public final static int WRITE_METHOD = 1;
-
-    public final static int NOTIFY_METHOD = 2;
-
-    private boolean isFinish = false;
-
     private List<UuidMethod> uuidMethodList;
 
-    private int maxMethodValue;
+    private int maxMethodCount;
 
-    private int currentMethodValue;
+    private int currentMethodCount;
 
-    private int currentMethodType;
-
-    public UuidMethodManager(List<UuidMethod> uuidMethodList){
+    public UuidMethodManager(List<UuidMethod> uuidMethodList) {
 
         this.uuidMethodList = uuidMethodList;
 
-        maxMethodValue = uuidMethodList.size();
+        maxMethodCount = uuidMethodList.size();
 
-        currentMethodValue = -1;
+        currentMethodCount = uuidMethodList.size() - uuidMethodList.size();
 
     }
 
-    public boolean isCheckFinish(){
-        return this.isFinish;
-    }
+    public UuidMethod getUuidMethod() {
 
-    public UuidMethod getUuidMethod(){
+        UuidMethod uuidMethod;
 
-        currentMethodValue++;
+        if (currentMethodCount==maxMethodCount){
 
-        if (currentMethodValue>=maxMethodValue){
+           uuidMethod = uuidMethodList.get(currentMethodCount-1);
 
-            isFinish = true;
+        }else{
+
+            uuidMethod = uuidMethodList.get(currentMethodCount);
+
+            currentMethodCount++;
 
         }
 
-        UuidMethod uuidMethod = uuidMethodList.get(currentMethodValue);
-
         return uuidMethod;
+
     }
 
 }

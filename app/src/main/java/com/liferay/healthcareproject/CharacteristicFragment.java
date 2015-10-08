@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.liferay.healthcareproject.bluetooth.BluetoothGattManager;
 import com.liferay.healthcareproject.network.PostManager;
 
@@ -406,13 +407,23 @@ public class CharacteristicFragment extends BaseDialogFragment
 
     }
 
-    class LoggingTimerTask extends TimerTask implements PostManager.ResponseListener{
+    class LoggingTimerTask extends TimerTask {
 
         private PostManager postManager;
 
         public LoggingTimerTask(){
 
-            postManager =  new PostManager(getActivity(),Constants.REQUEST_URL,this);
+            postManager = new PostManager(getActivity(),Constants.REQUEST_URL) {
+                @Override
+                public void onResponse(String response) {
+                    super.onResponse(response);
+                }
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    super.onErrorResponse(error);
+                }
+            };
 
         }
 
@@ -421,16 +432,6 @@ public class CharacteristicFragment extends BaseDialogFragment
 
             loggingToServer();
 
-        }
-
-        @Override
-        public Response.Listener<String> onResponse(String response) {
-            return null;
-        }
-
-        @Override
-        public Response.ErrorListener onErrorResponse() {
-            return null;
         }
 
         private void loggingToServer(){

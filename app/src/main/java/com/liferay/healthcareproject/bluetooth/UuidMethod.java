@@ -2,6 +2,14 @@ package com.liferay.healthcareproject.bluetooth;
 
 public class UuidMethod {
 
+    public final static int READ = 0;
+
+    public final static int WRITE = 1;
+
+    public final static int NOTIFY = 2;
+
+    public final static int FINISH = 3;
+
     private String name;
 
     private String uuid;

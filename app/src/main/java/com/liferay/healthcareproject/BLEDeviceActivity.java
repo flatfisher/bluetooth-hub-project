@@ -10,27 +10,37 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
 import com.liferay.healthcareproject.bluetooth.BluetoothGattManager;
 import com.liferay.healthcareproject.bluetooth.BlueToothGattListener;
+import com.liferay.healthcareproject.bluetooth.DeviceMethodObject;
 import com.liferay.healthcareproject.bluetooth.UuidConstants;
 import com.liferay.healthcareproject.bluetooth.UuidMethod;
 import com.liferay.healthcareproject.bluetooth.UuidMethodManager;
+import com.liferay.healthcareproject.network.GetManager;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Handler;
 
 public class BLEDeviceActivity extends BaseActivity
         implements BlueToothGattListener,
         View.OnClickListener,
         CharacteristicFragment.CallBackToActivityListener {
 
+    private String deviceName;
+
     private TextView deviceNameText;
+
+    private Spinner uuidMethodSpinner;
 
     private Button uuidMethodButton;
 
@@ -52,6 +62,8 @@ public class BLEDeviceActivity extends BaseActivity
 
     private UuidMethodManager uuidMethodManager;
 
+    private DeviceMethodObject deviceMethodObject;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +71,8 @@ public class BLEDeviceActivity extends BaseActivity
         setContentView(R.layout.activity_bledevice);
 
         deviceNameText = (TextView) findViewById(R.id.device_name_text);
+
+        uuidMethodSpinner = (Spinner) findViewById(R.id.uuid_method_spinner);
 
         uuidMethodButton = (Button) findViewById(R.id.uuid_method_button);
 
@@ -70,9 +84,9 @@ public class BLEDeviceActivity extends BaseActivity
 
         setToolbar();
 
-        String name = getIntent().getStringExtra(DEVICE_NAME_INTENT);
+        deviceName = getIntent().getStringExtra(DEVICE_NAME_INTENT);
 
-        deviceNameText.setText(name);
+        deviceNameText.setText(deviceName);
 
         String address = getIntent().getStringExtra(ADDRESS_INTENT);
 
@@ -122,9 +136,10 @@ public class BLEDeviceActivity extends BaseActivity
 
             addCharacteristicUuid(services.get(i).getCharacteristics());
 
+
         }
 
-        stopProgressBar();
+        findUuidMethod();
 
     }
 
@@ -136,6 +151,8 @@ public class BLEDeviceActivity extends BaseActivity
             characteristicFragment.onReadCharacteristicResult(gatt, characteristic, status);
         }
 
+        doUuidMethodForGattListener(characteristic);
+
     }
 
     @Override
@@ -146,29 +163,16 @@ public class BLEDeviceActivity extends BaseActivity
             characteristicFragment.onNotifyResult(gatt, characteristic);
         }
 
-        if (uuidMethodManager!=null){
-            if (uuidMethodManager.isCheckFinish()){
 
-                String value = BluetoothGattManager.getCharacteristicValue(characteristic);
+        doUuidMethodForGattListener(characteristic);
 
-                ViewThreadHandler.setText(valueText,value);
-            }
-        }
     }
 
     @Override
     public void onCharacteristicWrite(BluetoothGatt gatt,
                                       BluetoothGattCharacteristic characteristic, int status) {
 
-        Log.i("onChara",""+uuidMethodManager.getUuidMethod().getMethodType());
-        if (uuidMethodManager!=null){
-            if (uuidMethodManager.isCheckFinish()){
-                if (uuidMethodManager.getUuidMethod().getMethodType()==2){
-                    bluetoothGattManager.notifyCharacteristic(allCharacteristicList.
-                            get(uuidMethodManager.getUuidMethod().getMethodType()),true);
-                }
-            }
-        }
+        doUuidMethodForGattListener(characteristic);
 
     }
 
@@ -204,12 +208,55 @@ public class BLEDeviceActivity extends BaseActivity
 
     }
 
+    private void findUuidMethod() {
+
+        final String requestUrl = Constants.REQUEST_URL + Constants.UUID_METHOD_PATH;
+
+        GetManager getManager = new GetManager(this, requestUrl) {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                deviceMethodObject = new DeviceMethodObject(response,deviceName);
+                setUuidMethodToSpinner();
+            }
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i("onErrorResponse", "" + error);
+            }
+
+        };
+    }
+
+    private void setUuidMethodToSpinner() {
+
+        ArrayAdapter<String> adapter = new
+                ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
+
+        List<String> methods = deviceMethodObject.getMethodList();
+
+        for (String method:methods){
+
+            adapter.add(method);
+
+        }
+
+        uuidMethodSpinner.setAdapter(adapter);
+
+        uuidMethodButton.setEnabled(true);
+
+    }
+
     @Override
     public void onClick(View view) {
 
         if (view.getId() == R.id.uuid_method_button) {
 
-            doUuidMethod();
+            String selectedMethod = (String) uuidMethodSpinner.getSelectedItem();
+
+            List<UuidMethod> uuidMethodList = deviceMethodObject.getUuidMethodList(selectedMethod);
+
+            setUuidMethodManager(uuidMethodList);
 
         } else {
 
@@ -249,28 +296,98 @@ public class BLEDeviceActivity extends BaseActivity
         bluetoothGattManager.notifyCharacteristic(characteristic, enable);
     }
 
-    private void doUuidMethod() {
-        List<UuidMethod> uuidMethods = new ArrayList<UuidMethod>();
-        UuidMethod uuidMethod = new UuidMethod();
-        uuidMethod.setUuid(UuidConstants.ACC_ENABLE);
-        uuidMethod.setMethodType(1);
-        uuidMethod.setValue("05");
-        uuidMethods.add(uuidMethod);
+    private void setUuidMethodManager(List<UuidMethod> uuidMethodList) {
 
-        UuidMethod uuidMethod2 = new UuidMethod();
-        uuidMethod2.setUuid(UuidConstants.ACC_GEN_CFG);
-        uuidMethod2.setMethodType(2);
-        uuidMethod2.setValue("05");
-        uuidMethods.add(uuidMethod2);
+        uuidMethodManager = new UuidMethodManager(uuidMethodList);
 
-        uuidMethodManager = new UuidMethodManager(uuidMethods);
-        if (!uuidMethodManager.isCheckFinish()) {
-            if (uuidMethodManager.getUuidMethod().getMethodType() == 1) {
-                bluetoothGattManager.writeCharacteristic(allCharacteristicList
-                                .get(getUuidPosition(uuidMethod.getUuid())),
-                        uuidMethodManager.getUuidMethod().getValue());
+        doUuidMethodForFirst();
+
+    }
+
+    private void doUuidMethodForFirst() {
+        switchUuidMethod(null);
+    }
+
+    private void doUuidMethodForGattListener(BluetoothGattCharacteristic characteristic) {
+        switchUuidMethod(characteristic);
+    }
+
+    private void switchUuidMethod(BluetoothGattCharacteristic characteristic) {
+        if (uuidMethodManager != null) {
+
+            UuidMethod uuidMethod = uuidMethodManager.getUuidMethod();
+
+            switch (uuidMethod.getMethodType()) {
+
+                case UuidMethod.READ:
+                    doUuidMethodRead(uuidMethod);
+                    break;
+
+                case UuidMethod.WRITE:
+                    doUuidMethodWrite(uuidMethod);
+                    break;
+
+                case UuidMethod.NOTIFY:
+                    doUuidMethodNotify(uuidMethod);
+                    break;
+
+                case UuidMethod.FINISH:
+                    doUuidMethodFinish(characteristic);
+                    break;
+                default:
+                    break;
             }
+
         }
+    }
+
+
+    private void doUuidMethodRead(UuidMethod uuidMethod) {
+
+        String uuid = uuidMethod.getUuid();
+
+        BluetoothGattCharacteristic characteristic = getCharacteristicFromCharacteristicList(uuid);
+
+        bluetoothGattManager.readCharacteristic(characteristic);
+
+    }
+
+    private void doUuidMethodWrite(UuidMethod uuidMethod) {
+
+        String uuid = uuidMethod.getUuid();
+
+        String value = uuidMethod.getValue();
+
+        BluetoothGattCharacteristic characteristic = getCharacteristicFromCharacteristicList(uuid);
+
+        bluetoothGattManager.writeCharacteristic(characteristic, value);
+
+    }
+
+    private void doUuidMethodNotify(UuidMethod uuidMethod) {
+
+        String uuid = uuidMethod.getUuid();
+
+        BluetoothGattCharacteristic characteristic = getCharacteristicFromCharacteristicList(uuid);
+
+        bluetoothGattManager.notifyCharacteristic(characteristic, true);
+
+    }
+
+    private void doUuidMethodFinish(BluetoothGattCharacteristic characteristic) {
+
+        String value = BluetoothGattManager.getCharacteristicValue(characteristic);
+
+        ViewThreadHandler.setText(valueText, value);
+
+    }
+
+    private BluetoothGattCharacteristic getCharacteristicFromCharacteristicList(String uuid) {
+        int position = getUuidPosition(uuid);
+
+        BluetoothGattCharacteristic characteristic = allCharacteristicList.get(position);
+
+        return characteristic;
     }
 
     private Integer getUuidPosition(String uuid) {

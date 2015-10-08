@@ -5,7 +5,9 @@ package com.liferay.healthcareproject;
  */
 public class Constants {
 
-    public static String REQUEST_URL = "";
+    public static String REQUEST_URL = "http://apiflatfisher.appspot.com";
+
+    public static String UUID_METHOD_PATH = "/uuidmethod";
 
     public final static String CHARACTERISTIC_DIALOG = "characteristic_dialog";
     

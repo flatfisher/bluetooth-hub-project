@@ -10,6 +10,7 @@ import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,14 +20,16 @@ import java.util.List;
 
 public class BlueToothDeviceManager implements BluetoothAdapter.LeScanCallback {
 
-    private static final int SCAN_PERIOD = 10000;
+    private static final int SCAN_PERIOD = 20000;
 
     private Context context;
 
     private BlueToothDeviceListener onDeviceListener;
 
     private BluetoothManager bluetoothManager;
+
     private BluetoothAdapter bluetoothAdapter;
+
     private BluetoothLeScanner bluetoothLeScanner;
 
     private Handler handler;
@@ -83,7 +86,7 @@ public class BlueToothDeviceManager implements BluetoothAdapter.LeScanCallback {
 
     @Override
     public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-
+        Log.i("device",""+device.getAddress());
     }
 
     private ScanCallback scanCallback = new ScanCallback() {
@@ -91,6 +94,7 @@ public class BlueToothDeviceManager implements BluetoothAdapter.LeScanCallback {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
+            Log.i("onScanResult", "" + result.getDevice().getAddress());
 
             onDeviceListener.onResult(callbackType, result);
 
@@ -100,12 +104,16 @@ public class BlueToothDeviceManager implements BluetoothAdapter.LeScanCallback {
         public void onBatchScanResults(List<ScanResult> results) {
             super.onBatchScanResults(results);
 
+            Log.i("onBatchScanResults", "passed");
         }
 
         @Override
         public void onScanFailed(int errorCode) {
             super.onScanFailed(errorCode);
+            Log.i("onScanFailed",""+errorCode);
         }
+
+
     };
 
     private void scanBlueToothDevices(final boolean enable) {
